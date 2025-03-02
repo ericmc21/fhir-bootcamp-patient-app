@@ -3,3 +3,4 @@ export const FHIR_BASE_URL = 'https://fhir.epic.com/interconnect-fhir-oauth/api/
 export const SMART_AUTH_URL = 'https://fhir.epic.com/interconnect-fhir-oauth/oauth2/authorize';
 export const SMART_TOKEN_URL = 'https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token';
 export const REDIRECT_URI = 'http://localhost:5173';
+export const CODE_VERIFIER_LOCAL_STORAGE_KEY = 'smart_code_verifier';
