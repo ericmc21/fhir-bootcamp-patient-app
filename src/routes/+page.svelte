@@ -6,10 +6,12 @@
 		REDIRECT_URI,
 		FHIR_BASE_URL,
 		SMART_TOKEN_URL,
-		CODE_VERIFIER_LOCAL_STORAGE_KEY
+		CODE_VERIFIER_LOCAL_STORAGE_KEY,
+		TOKEN_RESPONSE_LOCAL_STORAGE_KEY
 	} from '../config';
 	import axios from 'axios';
 	import pkceChallenge from 'pkce-challenge';
+	import PatientDetails from '$lib/PatientDetails.svelte';
 
 	let tokenResponse: {
 		access_token: string;
@@ -40,15 +42,23 @@
 
 	onMount(async () => {
 		const code = new URL(window.location.href).searchParams.get('code');
-		console.log(code);
 		const codeVerifier = localStorage.getItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
-		try {
-			if (code && codeVerifier) {
-				await makeTokenRequest(code, codeVerifier);
-				localStorage.removeItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
+		const tokenResponseString = localStorage.getItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY);
+		console.log('TRS: ' + tokenResponseString);
+		if (tokenResponseString) {
+			// TODO: check if tokenResponse expired
+			const tokenResponseTemp = JSON.parse(tokenResponseString);
+			console.log('TRT: ' + JSON.stringify(tokenResponseTemp));
+			tokenResponse = tokenResponseTemp;
+		} else {
+			try {
+				if (code && codeVerifier) {
+					await makeTokenRequest(code, codeVerifier);
+					localStorage.removeItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
+				}
+			} catch (e) {
+				console.error(e);
 			}
-		} catch (e) {
-			console.error(e);
 		}
 		loading = false;
 	});
@@ -69,6 +79,7 @@
 
 		const response = await axios.postForm(SMART_TOKEN_URL, tokenRequestForm);
 		tokenResponse = response.data;
+		localStorage.setItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY, JSON.stringify(tokenResponse));
 	};
 </script>
 
@@ -76,7 +87,7 @@
 	{#if loading}
 		Loading...
 	{:else if tokenResponse}
-		{JSON.stringify(tokenResponse)}
+		<PatientDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
 	{:else}
 		<div class="my-20 flex justify-center">
 			<button
