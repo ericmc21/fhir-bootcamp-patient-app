@@ -21,6 +21,11 @@
 	};
 
 	let loading = true;
+
+	const getSeconds = (date: Date) => {
+		return Math.round(date.getTime() / 1000);
+	};
+
 	const generateCodeChallenge = async () => {
 		const { code_challenge, code_verifier } = await pkceChallenge();
 		localStorage.setItem(CODE_VERIFIER_LOCAL_STORAGE_KEY, code_verifier);
@@ -48,16 +53,21 @@
 		if (tokenResponseString) {
 			// TODO: check if tokenResponse expired
 			const tokenResponseTemp = JSON.parse(tokenResponseString);
-			console.log('TRT: ' + JSON.stringify(tokenResponseTemp));
-			tokenResponse = tokenResponseTemp;
-		} else {
-			try {
-				if (code && codeVerifier) {
-					await makeTokenRequest(code, codeVerifier);
-					localStorage.removeItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
-				}
-			} catch (e) {
-				console.error(e);
+			const { issued_at_in_secs } = tokenResponseTemp;
+			const expires_in_secs = issued_at_in_secs + tokenResponseTemp.expires_in_secs;
+			const now_in_secs = getSeconds(new Date());
+			if (now_in_secs > expires_in_secs) {
+				localStorage.removeItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY);
+			} else {
+				console.log('TRT: ' + JSON.stringify(tokenResponseTemp));
+				tokenResponse = tokenResponseTemp;
+			}
+		}
+
+		if (!tokenResponse) {
+			if (code && codeVerifier) {
+				await makeTokenRequest(code, codeVerifier);
+				localStorage.removeItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
 			}
 		}
 		loading = false;
@@ -76,10 +86,13 @@
 		tokenRequestForm.set('redirect_uri', REDIRECT_URI);
 		tokenRequestForm.set('client_id', CLIENT_ID);
 		tokenRequestForm.set('code_verifier', codeVerifier);
-
+		const tokenGeneratedAt = getSeconds(new Date());
 		const response = await axios.postForm(SMART_TOKEN_URL, tokenRequestForm);
 		tokenResponse = response.data;
-		localStorage.setItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY, JSON.stringify(tokenResponse));
+		localStorage.setItem(
+			TOKEN_RESPONSE_LOCAL_STORAGE_KEY,
+			JSON.stringify({ ...tokenResponse, issued_at_in_secs: tokenGeneratedAt })
+		);
 	};
 </script>
 
