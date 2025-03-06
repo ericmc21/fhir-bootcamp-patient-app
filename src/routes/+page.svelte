@@ -12,6 +12,7 @@
 	import axios from 'axios';
 	import pkceChallenge from 'pkce-challenge';
 	import PatientDetails from '$lib/PatientDetails.svelte';
+	import MedicationDetails from '../MedicationDetails.svelte';
 
 	let tokenResponse: {
 		access_token: string;
@@ -102,6 +103,7 @@
 		Loading...
 	{:else if tokenResponse}
 		<PatientDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
+		<MedicationDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
 	{:else}
 		<div class="my-20 flex justify-center">
 			<button
