@@ -49,17 +49,18 @@
 		const code = new URL(window.location.href).searchParams.get('code');
 		const codeVerifier = localStorage.getItem(CODE_VERIFIER_LOCAL_STORAGE_KEY);
 		const tokenResponseString = localStorage.getItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY);
-		console.log('TRS: ' + tokenResponseString);
+		//console.log('TRS: ' + tokenResponseString);
 		if (tokenResponseString) {
 			// TODO: check if tokenResponse expired
 			const tokenResponseTemp = JSON.parse(tokenResponseString);
 			const { issued_at_in_secs } = tokenResponseTemp;
-			const expires_in_secs = issued_at_in_secs + tokenResponseTemp.expires_in_secs;
+			const expires_in_secs = issued_at_in_secs + tokenResponseTemp.expires_in;
 			const now_in_secs = getSeconds(new Date());
+
 			if (now_in_secs > expires_in_secs) {
 				localStorage.removeItem(TOKEN_RESPONSE_LOCAL_STORAGE_KEY);
 			} else {
-				console.log('TRT: ' + JSON.stringify(tokenResponseTemp));
+				//console.log('TRT: ' + JSON.stringify(tokenResponseTemp));
 				tokenResponse = tokenResponseTemp;
 			}
 		}
