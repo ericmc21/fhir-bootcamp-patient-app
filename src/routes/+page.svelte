@@ -99,32 +99,59 @@
 	};
 </script>
 
-<main>
-	{#if loading}
-		Loading...
-	{:else if tokenResponse}
-		<PatientDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
-		<MedicationDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
-		<ObservationViewer
-			category="laboratory"
-			title="Lab Results"
-			accessToken={tokenResponse.access_token}
-			patientId={tokenResponse.patient}
-		/>
-		<ObservationViewer
-			category="vital-signs"
-			title="Vital Signs"
-			accessToken={tokenResponse.access_token}
-			patientId={tokenResponse.patient}
-		/>
-	{:else}
-		<div class="my-20 flex justify-center">
-			<button
-				class="bg-black p-3 text-white"
-				on:click={() => {
-					initiateAuthorizationRequest();
-				}}>Sign in with Epic</button
-			>
-		</div>
-	{/if}
+<main class="flex min-h-screen bg-gray-100">
+	<!-- Sidebar -->
+	<aside class="hidden w-64 bg-white p-6 shadow-md md:block">
+		<h2 class="border-b pb-2 text-lg font-semibold text-gray-700">Patient Dashboard</h2>
+		<ul class="mt-4 space-y-3 text-gray-600">
+			<li class="cursor-pointer hover:text-blue-600">Patient Details</li>
+			<li class="cursor-pointer hover:text-blue-600">Medications</li>
+			<li class="cursor-pointer hover:text-blue-600">Observations</li>
+		</ul>
+	</aside>
+
+	<!-- Main Content -->
+	<section class="flex-1 p-6">
+		{#if loading}
+			<div class="flex h-screen items-center justify-center">
+				<p class="text-gray-600">Loading patient records...</p>
+			</div>
+		{:else if tokenResponse}
+			<div class="grid gap-6">
+				<PatientDetails
+					key={tokenResponse.patient}
+					accessToken={tokenResponse.access_token}
+					patientId={tokenResponse.patient}
+				/>
+				<MedicationDetails
+					accessToken={tokenResponse.access_token}
+					patientId={tokenResponse.patient}
+				/>
+				<ObservationViewer
+					category="laboratory"
+					title="Lab Results"
+					accessToken={tokenResponse.access_token}
+					patientId={tokenResponse.patient}
+				/>
+
+				<ObservationViewer
+					category="vital-signs"
+					title="Vital Signs"
+					accessToken={tokenResponse.access_token}
+					patientId={tokenResponse.patient}
+				/>
+			</div>
+		{:else}
+			<div class="mt-20 flex justify-center">
+				<button
+					class="rounded-lg bg-blue-600 px-4 py-2 text-white shadow-md hover:bg-blue-700"
+					on:click={() => {
+						initiateAuthorizationRequest();
+					}}
+				>
+					Sign in with Epic
+				</button>
+			</div>
+		{/if}
+	</section>
 </main>

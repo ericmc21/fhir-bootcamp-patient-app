@@ -17,7 +17,6 @@
 				}
 			}
 		);
-		console.log(medicationResponse.data);
 		return medicationResponse.data;
 	};
 
@@ -31,28 +30,35 @@
 	};
 </script>
 
-<div class="mx-auto mt-10 max-w-md">
+<div class="max-w-lg rounded-lg border border-blue-100 bg-blue-50 p-6 shadow-sm">
 	{#await getMedications()}
-		loading...
+		<p class="text-sm text-gray-500">Loading medications...</p>
 	{:then medicationList}
-		<h1 class="text-2xl">Medication List</h1>
+		<h2 class="mb-2 text-2xl font-semibold text-gray-800">Medication List</h2>
 
-		{#each getMedicationRequestEntries(medicationList) as medication, i}
-			<p class="font-medium">
-				{i + 1}. {medication.resource?.medicationReference?.display}
-			</p>
-			<div class="ml-4">
-				{#if medication?.resource?.dosageInstruction?.[0].patientInstruction}
-					<p>
-						Dosage: {medication?.resource?.dosageInstruction?.[0]?.patientInstruction}
+		<div class="mt-5 space-y-4">
+			{#each getMedicationRequestEntries(medicationList) as medication, i}
+				<div class="border-b border-gray-200 pb-4">
+					<p class="font-medium text-gray-700">
+						{i + 1}. {medication.resource?.medicationReference?.display}
 					</p>
-				{/if}
-				{#if medication?.resource?.reasonCode?.[0].text}
-					<p>
-						Reason: {medication?.resource?.reasonCode?.[0]?.text}
-					</p>
-				{/if}
-			</div>
-		{/each}
+
+					<div class="ml-4 space-y-1 text-gray-800">
+						{#if medication?.resource?.dosageInstruction?.[0].patientInstruction}
+							<p class="text-sm">
+								<span class="font-medium text-gray-700">Dosage:</span>
+								{medication?.resource?.dosageInstruction?.[0]?.patientInstruction}
+							</p>
+						{/if}
+						{#if medication?.resource?.reasonCode?.[0].text}
+							<p class="text-sm">
+								<span class="font-medium text-gray-700">Reason:</span>
+								{medication?.resource?.reasonCode?.[0]?.text}
+							</p>
+						{/if}
+					</div>
+				</div>
+			{/each}
+		</div>
 	{/await}
 </div>
