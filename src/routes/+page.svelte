@@ -13,7 +13,7 @@
 	import pkceChallenge from 'pkce-challenge';
 	import PatientDetails from '$lib/PatientDetails.svelte';
 	import MedicationDetails from '../MedicationDetails.svelte';
-	import LabResults from '../LabResults.svelte';
+	import ObservationViewer from '../ObservationViewer.svelte';
 
 	let tokenResponse: {
 		access_token: string;
@@ -105,7 +105,18 @@
 	{:else if tokenResponse}
 		<PatientDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
 		<MedicationDetails accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
-		<LabResults accessToken={tokenResponse.access_token} patientId={tokenResponse.patient} />
+		<ObservationViewer
+			category="laboratory"
+			title="Lab Results"
+			accessToken={tokenResponse.access_token}
+			patientId={tokenResponse.patient}
+		/>
+		<ObservationViewer
+			category="vital-signs"
+			title="Vital Signs"
+			accessToken={tokenResponse.access_token}
+			patientId={tokenResponse.patient}
+		/>
 	{:else}
 		<div class="my-20 flex justify-center">
 			<button
