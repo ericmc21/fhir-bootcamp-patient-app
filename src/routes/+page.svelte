@@ -11,7 +11,7 @@
 	} from '../config';
 	import axios from 'axios';
 	import pkceChallenge from 'pkce-challenge';
-	import PatientDetails from '$lib/PatientDetails.svelte';
+	import PatientDetails from '../PatientDetails.svelte';
 	import MedicationDetails from '../MedicationDetails.svelte';
 	import ObservationViewer from '../ObservationViewer.svelte';
 
@@ -119,7 +119,6 @@
 		{:else if tokenResponse}
 			<div class="grid gap-6">
 				<PatientDetails
-					key={tokenResponse.patient}
 					accessToken={tokenResponse.access_token}
 					patientId={tokenResponse.patient}
 				/>
